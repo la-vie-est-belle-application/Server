@@ -1,8 +1,11 @@
 package lavi.scheduler.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lavi.scheduler.domain.KakaoInfo;
 import lavi.scheduler.domain.OAuthToken;
+import lavi.scheduler.domain.UserSession;
 import lavi.scheduler.service.KakaoLoginService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +33,7 @@ public class KakaoLoginController {
     }
 
     @GetMapping("/login/kakao/oauth")
-    public void kakaoLogin(@RequestParam String code) throws JsonProcessingException {
+    public String kakaoLogin(@RequestParam String code, HttpServletRequest httpServletRequest) throws JsonProcessingException {
 
         //2. 토큰 받기
         log.info("[*]   토큰 받기");
@@ -42,13 +45,24 @@ public class KakaoLoginController {
         KakaoInfo userInfo = kakaoLoginService.getUserInfo(accessToken);
 
         //4. 사용자 정보의 id 이용해서 회원인지 아닌지 검증
-        boolean isMember = kakaoLoginService.isMember(userInfo.getId());
-        if (isMember) {
-            //회원이면 로그인 성공 화면으로 이동
-            log.info("[*]   로그인 성공!");
+        UserSession userSession = kakaoLoginService.isMember(userInfo.getId());
+        if (userSession == null) {
+            //회원이 아니면 회원가입 화면으로 이동(카카오 회원번호 같이 넘김)
+            log.info("[*]   로그인 실패! 카카오 회원번호 전송 = {}", userInfo.getId());
+
+            HttpSession httpSession = httpServletRequest.getSession();
+            httpSession.setAttribute("kakaoId", userInfo.getId());
+
+            return "redirect:/join";
         } else {
-            //회원이 아니면 회원가입 화면으로 이동(이 때 카카오 id client 로 넘겨서 회원가입할 때 포함해서 Member 객체 생성해야함)
-            log.info("[*]   로그인 실패!");
+            //회원이면 홈 화면으로 이동
+            log.info("[*]   로그인 성공!");
+
+            //세션 생성
+            HttpSession httpSession = httpServletRequest.getSession();
+            httpSession.setAttribute("userSession", userSession);
+
+            return "redirect:/";
         }
 
     }
