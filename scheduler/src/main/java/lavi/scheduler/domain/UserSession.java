@@ -8,5 +8,5 @@ import lombok.Getter;
 public class UserSession {
     private Long id;
     private String name;
-    private RollType rollType;
+    private Boolean rollType;
 }

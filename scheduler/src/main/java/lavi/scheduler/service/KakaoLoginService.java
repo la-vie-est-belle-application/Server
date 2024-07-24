@@ -93,7 +93,7 @@ public class KakaoLoginService {
         if (member == null) {
             return null;
         } else {
-            return new UserSession(member.getId(), member.getName(), member.getRollType());
+            return new UserSession(member.getId(), member.getName(), member.isRollType());
         }
     }
 }
