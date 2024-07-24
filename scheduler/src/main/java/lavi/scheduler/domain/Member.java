@@ -16,8 +16,11 @@ public class Member {
     private int pay;
     private String gender;
 
-    @Enumerated(EnumType.STRING)
-    private RollType rollType;
+    @Column(columnDefinition = "TINYINT(1)")
+    private boolean confirm;      //0:false, 1:true
+
+    @Column(columnDefinition = "TINYINT(1)")
+    private boolean rollType;       //true = 관리자 = 1 , false = 알바생 = 0
 
     public Member(String kakaoId, String name, String eMail, String gender) {
         this.kakaoId = kakaoId;
@@ -25,7 +28,8 @@ public class Member {
         this.eMail = eMail;
         this.pay = 10000;
         this.gender = gender;
-        this.rollType = RollType.User;
+        this.rollType = false;
+        this.confirm = false;
     }
 
     public Member() {
