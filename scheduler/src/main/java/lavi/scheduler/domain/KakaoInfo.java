@@ -10,12 +10,12 @@ import java.time.LocalDateTime;
 @JsonIgnoreProperties({"kakao_account"})
 @Getter
 public class KakaoInfo {
-    private Long id;
+    private String id;
     private LocalDateTime connectedAt;
     private Properties properties;
 
     @JsonCreator
-    public KakaoInfo(@JsonProperty("id") Long id,
+    public KakaoInfo(@JsonProperty("id") String id,
                      @JsonProperty("connected_at") LocalDateTime connectedAt,
                      @JsonProperty("properties") Properties properties) {
         this.id = id;

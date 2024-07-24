@@ -4,4 +4,5 @@ import lavi.scheduler.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
+    Member findByKakaoId(String id);
 }
