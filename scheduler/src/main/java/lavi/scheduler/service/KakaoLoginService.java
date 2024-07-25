@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lavi.scheduler.domain.KakaoInfo;
 import lavi.scheduler.domain.Member;
 import lavi.scheduler.domain.OAuthToken;
-import lavi.scheduler.domain.UserSession;
 import lavi.scheduler.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
