@@ -23,5 +23,16 @@ public class ScheduleManagement {
     @Enumerated(EnumType.STRING)
     private Position position;
 
-    private int managementStatus;
+    @Column(columnDefinition = "TINYINT(1)")
+    private boolean managementStatus;       //true = 승인 = 1 , false = 거절(신청상태) = 0
+
+    public ScheduleManagement(Schedule schedule, Member member) {
+        this.schedule = schedule;
+        this.member = member;
+        this.managementStatus = false;
+    }
+
+    public ScheduleManagement() {
+
+    }
 }

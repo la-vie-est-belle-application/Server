@@ -17,7 +17,16 @@ public class Schedule {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
+    public Schedule(LocalDate workingDate) {
+        this.workingDate = workingDate;
+    }
+
     public Schedule() {
 
+    }
+
+    public void update(LocalDateTime startTime, LocalDateTime endTime) {
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 }
