@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lavi.scheduler.domain.KakaoInfo;
 import lavi.scheduler.domain.Member;
 import lavi.scheduler.domain.OAuthToken;
-import lavi.scheduler.domain.UserSession;
 import lavi.scheduler.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -87,13 +86,13 @@ public class KakaoLoginService {
         return rt.exchange(urlStr, HttpMethod.GET, userInfoRequest, KakaoInfo.class).getBody();
     }
 
-    public UserSession isMember(String id) {
+    public Member isMember(String id) {
         log.info("[*]   데이터베이스에서 카카오 고유 id와 일치하는 값이 있는지 검증");
         Member member = memberRepository.findByKakaoId(id);
         if (member == null) {
             return null;
         } else {
-            return new UserSession(member.getId(), member.getName(), member.isRollType());
+            return member;
         }
     }
 }
