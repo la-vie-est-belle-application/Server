@@ -24,6 +24,8 @@ public class ScheduleManagementService {
 
     //스케줄에 등록된 날짜 맞는지 검증
     public List<LocalDate> verifyDate(List<LocalDate> registerDateList) {
+        log.info("[*]   출근 가능 날짜 검증");
+
         List<LocalDate> unverifiedDate = registerDateList.stream()
                 .filter(date -> !scheduleRepository.existsByWorkingDate(date))
                 .toList();
