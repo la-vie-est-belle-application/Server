@@ -11,7 +11,7 @@ import java.time.LocalTime;
 public class Schedule {
 
     @Id @GeneratedValue
-    @Column( name = "schedule_id")
+    @Column( name = "scheduleManagement_id")
     private Long id;
     private LocalDate workingDate;
     private LocalTime startTime;
