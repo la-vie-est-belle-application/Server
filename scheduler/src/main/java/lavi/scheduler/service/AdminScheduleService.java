@@ -15,7 +15,7 @@ import java.util.List;
 @Transactional
 @Slf4j
 @RequiredArgsConstructor
-public class ScheduleService {
+public class AdminScheduleService {
 
     private final ScheduleRepository scheduleRepository;
 
@@ -31,6 +31,7 @@ public class ScheduleService {
         return scheduleList;
     }
 
+
     public Schedule updateSchedule(LocalDate workingDate, LocalTime startTime, LocalTime endTime) {
         Schedule schedule = scheduleRepository.findByWorkingDate(workingDate);
         if (schedule == null) {
@@ -42,4 +43,9 @@ public class ScheduleService {
             return schedule;
         }
     }
+
+
+
+
+
 }

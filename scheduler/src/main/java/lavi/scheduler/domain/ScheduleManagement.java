@@ -13,7 +13,7 @@ public class ScheduleManagement {
     private Long id;
 
     @ManyToOne
-    @JoinColumn( name = "schedule_id")
+    @JoinColumn( name = "scheduleManagement_id")
     private Schedule schedule;
 
     @ManyToOne
@@ -23,13 +23,13 @@ public class ScheduleManagement {
     @Enumerated(EnumType.STRING)
     private Position position;
 
-    @Column(columnDefinition = "TINYINT(1)")
-    private boolean managementStatus;       //true = 승인 = 1 , false = 거절(신청상태) = 0
+    @Enumerated(EnumType.STRING)
+    private ManagementStatus managementStatus;
 
     public ScheduleManagement(Schedule schedule, Member member) {
         this.schedule = schedule;
         this.member = member;
-        this.managementStatus = false;
+        this.managementStatus = ManagementStatus.WAIT;
     }
 
     public ScheduleManagement() {

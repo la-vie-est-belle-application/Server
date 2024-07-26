@@ -4,8 +4,8 @@ import lavi.scheduler.domain.Member;
 import lavi.scheduler.domain.Schedule;
 import lavi.scheduler.domain.ScheduleManagement;
 import lavi.scheduler.repository.MemberRepository;
-import lavi.scheduler.repository.ScheduleManagementRepository;
 import lavi.scheduler.repository.ScheduleRepository;
+import lavi.scheduler.repository.ScheduleManagementRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ScheduleManagementService {
+public class UserScheduleService {
 
     private final MemberRepository memberRepository;
     private final ScheduleRepository scheduleRepository;
@@ -34,7 +34,7 @@ public class ScheduleManagementService {
         return unverifiedDate;
     }
 
-    public boolean addScheduleManagement(Long id, List<LocalDate> registerDateList) {
+    public boolean registerSchedule(Long id, List<LocalDate> registerDateList) {
         //해당 id에 맞는 회원 찾기
         Member member = memberRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("유효하지 않은 회원 번호 입니다 : " + id)
@@ -48,8 +48,10 @@ public class ScheduleManagementService {
                 return false;
             }
             ScheduleManagement scheduleManagement = new ScheduleManagement(schedule, member);
-            scheduleManagementRepository.save(scheduleManagement);
+            this.scheduleManagementRepository.save(scheduleManagement);
         }
         return true;
     }
+
+
 }

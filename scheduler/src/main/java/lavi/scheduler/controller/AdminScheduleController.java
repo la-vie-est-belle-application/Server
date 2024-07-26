@@ -2,7 +2,7 @@ package lavi.scheduler.controller;
 
 import lavi.scheduler.domain.ResponseDto;
 import lavi.scheduler.domain.Schedule;
-import lavi.scheduler.service.ScheduleService;
+import lavi.scheduler.service.AdminScheduleService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,14 +21,14 @@ import java.util.Map;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-public class ScheduleController {
-    //ScheduleController 는 전부 다 관리자만 사용할 수 있는 기능임. session 이용해서 구분하는 기능 추가하기
-    private final ScheduleService scheduleService;
+public class AdminScheduleController {
+    //AdminScheduleController 는 전부 다 관리자만 사용할 수 있는 기능임. session 이용해서 구분하는 기능 추가하기
+    private final AdminScheduleService adminScheduleService;
 
     @PostMapping("/schedule/add")
     public ResponseEntity<ResponseDto> addSchedule(@RequestBody AddScheduleDto addScheduleDto) {
         log.info("[*]   입력 받은 날짜 이용해서 스케줄 등록");
-        List<Schedule> scheduleList = scheduleService.addSchedule(addScheduleDto.workingDate);
+        List<Schedule> scheduleList = adminScheduleService.addSchedule(addScheduleDto.workingDate);
 
         if (scheduleList.isEmpty()) {
             log.info("[*]   스케줄 등록 실패");
@@ -46,7 +46,7 @@ public class ScheduleController {
     @PostMapping("/schedule/update")
     public ResponseEntity<ResponseDto> updateSchedule(@RequestBody ScheduleDto scheduleDto) {
         log.info("[*]   해당 날짜의 시간 정보 업데이트");
-        Schedule schedule = scheduleService.updateSchedule(scheduleDto.workingDate, scheduleDto.startTime, scheduleDto.endTime);
+        Schedule schedule = adminScheduleService.updateSchedule(scheduleDto.workingDate, scheduleDto.startTime, scheduleDto.endTime);
         if (schedule == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ResponseDto<>("등록되지 않은 날짜입니다.", false));
@@ -54,6 +54,18 @@ public class ScheduleController {
         return ResponseEntity.ok()
                 .body(new ResponseDto<>("시간 정보 업데이트 완료", true));
     }
+
+    // 해당 날짜에 출근 가능한 사람 정보 넘기기 (해당 스케줄 id 를 갖고 있는 memberList return)
+
+    // 입력한 포지션, 사람 받아오기
+
+    // 해당 날짜 출근인원 조회
+
+    // 매 월 출근인원 조회 (필요하면)
+
+    // 포지션 수정 기능
+
+    // 스케줄 삭제
 
     @Data
     static class AddScheduleDto {
