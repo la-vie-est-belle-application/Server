@@ -1,5 +1,6 @@
 package lavi.scheduler.service;
 
+import jakarta.transaction.Transactional;
 import lavi.scheduler.domain.Schedule;
 import lavi.scheduler.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
@@ -7,10 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
+@Transactional
 @Slf4j
 @RequiredArgsConstructor
 public class ScheduleService {
@@ -29,7 +31,7 @@ public class ScheduleService {
         return scheduleList;
     }
 
-    public Schedule updateSchedule(LocalDate workingDate, LocalDateTime startTime, LocalDateTime endTime) {
+    public Schedule updateSchedule(LocalDate workingDate, LocalTime startTime, LocalTime endTime) {
         Schedule schedule = scheduleRepository.findByWorkingDate(workingDate);
         if (schedule == null) {
             //workingDate 로 찾은 schedule 이 존재하지 않는다면 return null

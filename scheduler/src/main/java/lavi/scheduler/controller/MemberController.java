@@ -28,19 +28,19 @@ public class MemberController {
         if (httpSession == null) {
             log.info("[*]   세션 없음 카카오 로그인 화면으로 이동");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDto("카카오 로그인 필요", false));
+                    .body(new ResponseDto<>("카카오 로그인 필요", false));
         } else {
             Member member = new Member(memberDto.kakaoId, memberDto.name, memberDto.eMail, memberDto.gender);
             Member savedMember = memberService.saveMember(member);
             if (savedMember == null) {
                 log.info("[*]   회원 가입 실패");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(new ResponseDto("회원 정보 저장 실패", false));
+                        .body(new ResponseDto<>("회원 정보 저장 실패", false));
             }
         }
         log.info("[*]   회원 가입 성공");
         return ResponseEntity.ok()
-                .body(new ResponseDto("회원 가입 성공", true));
+                .body(new ResponseDto<>("회원 가입 성공", true));
     }
 
 

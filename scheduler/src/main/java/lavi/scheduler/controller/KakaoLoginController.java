@@ -59,7 +59,7 @@ public class KakaoLoginController {
             data.put("kakaoId", userInfo.getId());
 
             return ResponseEntity.ok()
-                    .body(new ResponseDto("회원 정보 없음", false, data));
+                    .body(new ResponseDto<>("회원 정보 없음", false, data));
         } else {
 
             log.info("[*]   로그인 성공!");
@@ -71,7 +71,7 @@ public class KakaoLoginController {
 
             //회원이면 result = true
             return ResponseEntity.ok()
-                    .body(new ResponseDto("로그인 성공", true));
+                    .body(new ResponseDto<>("로그인 성공", true));
 
         }
     }

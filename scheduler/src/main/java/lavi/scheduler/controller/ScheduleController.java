@@ -8,13 +8,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,14 +33,14 @@ public class ScheduleController {
         if (scheduleList.isEmpty()) {
             log.info("[*]   스케줄 등록 실패");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ResponseDto("스케줄 등록 실패", false));
+                    .body(new ResponseDto<>("스케줄 등록 실패", false));
         }
         log.info("[*]   스케줄 등록 성공");
         Map<String, List<Schedule>> data = new HashMap<>();
         data.put("scheduleList", scheduleList);
 
         return ResponseEntity.ok()
-                .body(new ResponseDto("스케줄 등록 성공", true, data));
+                .body(new ResponseDto<>("스케줄 등록 성공", true, data));
     }
 
     @PostMapping("/schedule/update")
@@ -50,10 +49,10 @@ public class ScheduleController {
         Schedule schedule = scheduleService.updateSchedule(scheduleDto.workingDate, scheduleDto.startTime, scheduleDto.endTime);
         if (schedule == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ResponseDto("등록되지 않은 날짜입니다.", false));
+                    .body(new ResponseDto<>("등록되지 않은 날짜입니다.", false));
         }
         return ResponseEntity.ok()
-                .body(new ResponseDto("시간 정보 업데이트 완료", true));
+                .body(new ResponseDto<>("시간 정보 업데이트 완료", true));
     }
 
     @Data
@@ -64,8 +63,8 @@ public class ScheduleController {
     @Data
     static class ScheduleDto{
         private LocalDate workingDate;
-        private LocalDateTime startTime;
-        private LocalDateTime endTime;
+        private LocalTime startTime;
+        private LocalTime endTime;
     }
 
 
