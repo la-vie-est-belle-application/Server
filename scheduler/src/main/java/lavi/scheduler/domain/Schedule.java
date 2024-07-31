@@ -29,7 +29,7 @@ public class Schedule {
 
     }
 
-    public void update(LocalTime startTime, LocalTime endTime) {
+    public void updateTime(LocalTime startTime, LocalTime endTime) {
         this.startTime = startTime;
         this.endTime = endTime;
     }
