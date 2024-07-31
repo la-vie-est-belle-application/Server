@@ -24,15 +24,21 @@ public class ScheduleManagement {
     private Position position;
 
     @Enumerated(EnumType.STRING)
-    private ManagementStatus managementStatus;
+    private RequestResult requestResult;
+
 
     public ScheduleManagement(Schedule schedule, Member member) {
         this.schedule = schedule;
         this.member = member;
-        this.managementStatus = ManagementStatus.WAIT;
+        this.requestResult = RequestResult.WAIT;
     }
 
     public ScheduleManagement() {
 
+    }
+
+    public void updateSchedule(Position position) {
+        this.position = position;
+        this.requestResult = RequestResult.ACCEPT;
     }
 }

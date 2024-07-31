@@ -1,9 +1,6 @@
 package lavi.scheduler.controller;
 
-import lavi.scheduler.domain.ManagementStatus;
-import lavi.scheduler.domain.Member;
-import lavi.scheduler.domain.Position;
-import lavi.scheduler.domain.Schedule;
+import lavi.scheduler.domain.*;
 import lavi.scheduler.service.AdminScheduleService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,24 +51,54 @@ public class AdminScheduleController {
 
     }
 
-    // 출퇴근시간 + 명단 + 포지션 + 마감여부 상태 업데이트
-//    @PostMapping("/schedule/register/update")
-//    public ResponseEntity<Map<String, Schedule>> updateSchedule(@RequestBody ScheduleDto scheduleDto, ScheduleManagementDto scheduleManagementDto) {
-//
-//        log.info("[*]   해당 날짜의 시간 정보 업데이트");
-//        Schedule updatedSchedule = adminScheduleService
-//                .updateSchedule(scheduleDto.getWorkingDate(), scheduleDto.getStartTime(), scheduleDto.getEndTime(),scheduleManagementDto.getMember(),scheduleManagementDto.getMembe(),scheduleManagementDto.getManagementStatus());
-//
-//        if (updatedSchedule == null) {
-//            log.info("[*]   해당 날짜의 시간 정보 업데이트 실패");
-//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//        log.info("[*]   해당 날짜의 시간 정보 업데이트 성공");
-//        Map<String, Schedule> data = new HashMap<>();
-//        data.put("schedule", updatedSchedule);
-//
-//            return ResponseEntity.ok().body(data);
-//    }
+    // 출퇴근시간 + 포지션 + 출근여부 상태 업데이트
+    @PostMapping("/schedule/register/update")
+    public ResponseEntity<String> updateSchedule(@RequestBody ScheduleDto scheduleDto, PositionDto positionDto) {
+
+        log.info("[*]   출퇴근 시간 업데이트 시작");
+        Schedule updatedSchedule = adminScheduleService
+                .updateTime(scheduleDto.getWorkingDate(), scheduleDto.getStartTime(), scheduleDto.getEndTime());
+
+        if (updatedSchedule == null) {
+            log.info("[*]   해당 날짜 출퇴근 시간 업데이트 실패");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+            log.info("[*]   해당 날짜 출퇴근 시간 업데이트 성공");
+            Map<String, Schedule> data = new HashMap<>();
+            data.put("schedule", updatedSchedule);
+
+        if (updatedSchedule.getWorkingDate() != null ){
+            log.info("[*]   포지션 정보 업데이트 시작");
+            List<User> leader = positionDto.getLeader();
+            List<User> scanner = positionDto.getScan();
+            List<User> main = positionDto.getMain();
+            List<User> dress = positionDto.getDress();
+            List<User> assistant = positionDto.getAssistant();
+            List<User> waitingRoom = positionDto.getWaitingRoom();
+            List<User> manager = positionDto.getManager();
+            List<User> navigator = positionDto.getNavigator();
+            List<User> dressRoom = positionDto.getDressRoom();
+
+            updatePosition(leader, Position.LEADER, updatedSchedule);
+            updatePosition(scanner, Position.SCAN, updatedSchedule);
+            updatePosition(main, Position.MAIN, updatedSchedule);
+            updatePosition(dress, Position.DRESS, updatedSchedule);
+            updatePosition(assistant, Position.ASSISTANT, updatedSchedule);
+            updatePosition(waitingRoom, Position.WAITINGROOM, updatedSchedule);
+            updatePosition(manager, Position.MANAGER, updatedSchedule);
+            updatePosition(navigator, Position.NAVIGATOR, updatedSchedule);
+            updatePosition(dressRoom, Position.DRESSROOM, updatedSchedule);
+        }
+            log.info("[*]   해당 날짜 포지션 업데이트 성공");
+            data.put("schedule", updatedSchedule);
+            return ResponseEntity.ok().build();
+
+    }
+
+    private List<ScheduleManagement> updatePosition(List<User> userList, Position position, Schedule updatedSchedule) {
+        List<ScheduleManagement> scheduleManagementList = adminScheduleService.updatePositions(userList, position, updatedSchedule);
+        return scheduleManagementList;
+    }
 
     // 해당 날짜 출근인원 조회
 
@@ -90,13 +118,6 @@ public class AdminScheduleController {
         private LocalDate workingDate;
         private LocalTime startTime;
         private LocalTime endTime;
-    }
-
-    @Data
-    static class ScheduleManagementDto {
-        private Member member;
-        private Position position;
-        private ManagementStatus managementStatus;
     }
 
 

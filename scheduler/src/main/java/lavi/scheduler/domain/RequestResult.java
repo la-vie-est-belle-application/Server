@@ -1,7 +1,8 @@
 package lavi.scheduler.domain;
 
-public enum ManagementStatus {
+public enum RequestResult {
     ACCEPT,
     WAIT,
-    BBB
+    FALL
+
 }

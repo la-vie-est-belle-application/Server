@@ -1,10 +1,9 @@
 package lavi.scheduler.service;
 
 import jakarta.transaction.Transactional;
-import lavi.scheduler.domain.ManagementStatus;
-import lavi.scheduler.domain.Member;
-import lavi.scheduler.domain.Position;
-import lavi.scheduler.domain.Schedule;
+import lavi.scheduler.domain.*;
+import lavi.scheduler.repository.MemberRepository;
+import lavi.scheduler.repository.ScheduleManagementRepository;
 import lavi.scheduler.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +11,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -20,7 +21,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminScheduleService {
 
+    private final MemberRepository memberRepository;
     private final ScheduleRepository scheduleRepository;
+    private final ScheduleManagementRepository scheduleManagementRepository;
 
     public List<Schedule> registerSchedule(List<LocalDate> workingDateList) {
 
@@ -35,17 +38,29 @@ public class AdminScheduleService {
     }
 
 
-//    public Schedule updateSchedule(LocalDate workingDate, LocalTime startTime, LocalTime endTime, Member member, Position position, ManagementStatus managementStatus) {
-//        Schedule schedule = scheduleRepository.findByWorkingDate(workingDate);
-//        if (schedule == null) {
-//            //workingDate 로 찾은 schedule 이 존재하지 않는다면 return null
-//            return null;
-//        } else {
-//            schedule.update(startTime, endTime, member, position, managementStatus);
-//            log.info("[*]   스케줄 정보 업데이트 완료 출근 시간 ={}, 퇴근 시간 ={}", schedule.getStartTime(), schedule.getEndTime(), schedule.getMember(), schedule.getPosition(), schedule.getManagementStatus());
-//            return schedule;
-//        }
-//    }
+    // 날짜 조회해서 출퇴근시간 업데이트
+    public Schedule updateTime(LocalDate workingDate, LocalTime startTime, LocalTime endTime) {
+        Schedule schedule = scheduleRepository.findByWorkingDate(workingDate);
+        if (schedule == null) {
+            //workingDate 로 찾은 schedule 이 존재하지 않는다면 return null
+            return null;
+        } else {
+            schedule.updateTime(startTime, endTime);
 
+            log.info("[*]   스케줄 정보 업데이트 완료 출근 시간 ={}, 퇴근 시간 ={}", schedule.getStartTime(), schedule.getEndTime());
+            return schedule;
+        }
+    }
 
+    //  포지션, 출근여부 업데이트
+    public List<ScheduleManagement> updatePositions(List<User> users, Position position, Schedule schedule) {
+            List<ScheduleManagement> scheduleManagementsList = new ArrayList<>();
+        for (User user : users) {
+            ScheduleManagement scheduleManagement = scheduleManagementRepository.findByScheduleAndMemberId(schedule, user.getId());
+            scheduleManagement.updateSchedule(position);
+            scheduleManagementsList.add(scheduleManagement);
+        }
+        return scheduleManagementsList;
+    }
 }
+

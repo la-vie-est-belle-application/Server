@@ -8,7 +8,7 @@ public enum Position {
     SCAN("스캔"),
     MAIN("메인"),
     DRESS("드레스"),
-    CHUKGA("축가"),
+    ASSISTANT("축가"),
     WAITINGROOM("대기실"),
     MANAGER("매니저"),
     NAVIGATOR("안내"),
