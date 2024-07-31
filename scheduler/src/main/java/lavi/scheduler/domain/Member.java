@@ -20,7 +20,7 @@ public class Member {
     private boolean confirm;      //0:false, 1:true
 
     @Column(columnDefinition = "TINYINT(1)")
-    private boolean rollType;       //true = 관리자 = 1 , false = 알바생 = 0
+    private boolean roleType;       //true = 관리자 = 1 , false = 알바생 = 0
 
     public Member(String kakaoId, String name, String eMail, String gender) {
         this.kakaoId = kakaoId;
@@ -28,7 +28,7 @@ public class Member {
         this.eMail = eMail;
         this.pay = 10000;
         this.gender = gender;
-        this.rollType = false;
+        this.roleType = false;
         this.confirm = false;
     }
 
