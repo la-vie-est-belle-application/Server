@@ -11,14 +11,18 @@ import java.time.LocalTime;
 public class Schedule {
 
     @Id @GeneratedValue
-    @Column( name = "scheduleManagement_id")
+    @Column( name = "schedule_id")
     private Long id;
     private LocalDate workingDate;
     private LocalTime startTime;
     private LocalTime endTime;
 
+    @Column(columnDefinition = "TINYINT(1)")
+    private Boolean scheduleStatus;     // 0:신청 마감 , 1: 신청 가능
+
     public Schedule(LocalDate workingDate) {
         this.workingDate = workingDate;
+        this.scheduleStatus = true;
     }
 
     public Schedule() {

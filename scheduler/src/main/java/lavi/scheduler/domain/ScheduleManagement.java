@@ -9,11 +9,11 @@ public class ScheduleManagement {
 
     @Id
     @GeneratedValue
-    @Column( name = "management_id")
+    @Column( name = "scheduleManagement_id")
     private Long id;
 
     @ManyToOne
-    @JoinColumn( name = "scheduleManagement_id")
+    @JoinColumn( name = "schedule_id")
     private Schedule schedule;
 
     @ManyToOne
