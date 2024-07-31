@@ -1,6 +1,8 @@
 package lavi.scheduler.controller;
 
-import lavi.scheduler.domain.ResponseDto;
+import lavi.scheduler.domain.ManagementStatus;
+import lavi.scheduler.domain.Member;
+import lavi.scheduler.domain.Position;
 import lavi.scheduler.domain.Schedule;
 import lavi.scheduler.service.AdminScheduleService;
 import lombok.Data;
@@ -8,9 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -25,39 +25,52 @@ public class AdminScheduleController {
     //AdminScheduleController 는 전부 다 관리자만 사용할 수 있는 기능임. session 이용해서 구분하는 기능 추가하기
     private final AdminScheduleService adminScheduleService;
 
-    @PostMapping("/schedule/add")
-    public ResponseEntity<ResponseDto> addSchedule(@RequestBody AddScheduleDto addScheduleDto) {
+    // 서버 session rolltype 검증 로직 필요
+//    public void serverSesisonCheck() {
+//
+//    }
+
+    @PostMapping("/schedule/register")
+    public ResponseEntity<Map<String, List<Schedule>>> registerSchedule(@RequestBody AddScheduleDto addScheduleDto) {
+
         log.info("[*]   입력 받은 날짜 이용해서 스케줄 등록");
-        List<Schedule> scheduleList = adminScheduleService.addSchedule(addScheduleDto.workingDate);
+        List<Schedule> scheduleList = adminScheduleService.registerSchedule(addScheduleDto.workingDate);
 
         if (scheduleList.isEmpty()) {
             log.info("[*]   스케줄 등록 실패");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ResponseDto<>("스케줄 등록 실패", false));
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         log.info("[*]   스케줄 등록 성공");
         Map<String, List<Schedule>> data = new HashMap<>();
         data.put("scheduleList", scheduleList);
 
-        return ResponseEntity.ok()
-                .body(new ResponseDto<>("스케줄 등록 성공", true, data));
+        return ResponseEntity.ok().body(data);
     }
 
-    @PostMapping("/schedule/update")
-    public ResponseEntity<ResponseDto> updateSchedule(@RequestBody ScheduleDto scheduleDto) {
-        log.info("[*]   해당 날짜의 시간 정보 업데이트");
-        Schedule schedule = adminScheduleService.updateSchedule(scheduleDto.workingDate, scheduleDto.startTime, scheduleDto.endTime);
-        if (schedule == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ResponseDto<>("등록되지 않은 날짜입니다.", false));
-        }
-        return ResponseEntity.ok()
-                .body(new ResponseDto<>("시간 정보 업데이트 완료", true));
+    // 날짜 상세보기 (출퇴근 시간, 명단, 포지션, 마감여부 상태 return)
+    @GetMapping("/schedule/register/{workingDate}")
+        public void detailSchedule(@PathVariable ScheduleDto workingDate) {
+
     }
 
-    // 해당 날짜에 출근 가능한 사람 정보 넘기기 (해당 스케줄 id 를 갖고 있는 memberList return)
-
-    // 입력한 포지션, 사람 받아오기
+    // 출퇴근시간 + 명단 + 포지션 + 마감여부 상태 업데이트
+//    @PostMapping("/schedule/register/update")
+//    public ResponseEntity<Map<String, Schedule>> updateSchedule(@RequestBody ScheduleDto scheduleDto, ScheduleManagementDto scheduleManagementDto) {
+//
+//        log.info("[*]   해당 날짜의 시간 정보 업데이트");
+//        Schedule updatedSchedule = adminScheduleService
+//                .updateSchedule(scheduleDto.getWorkingDate(), scheduleDto.getStartTime(), scheduleDto.getEndTime(),scheduleManagementDto.getMember(),scheduleManagementDto.getMembe(),scheduleManagementDto.getManagementStatus());
+//
+//        if (updatedSchedule == null) {
+//            log.info("[*]   해당 날짜의 시간 정보 업데이트 실패");
+//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//        log.info("[*]   해당 날짜의 시간 정보 업데이트 성공");
+//        Map<String, Schedule> data = new HashMap<>();
+//        data.put("schedule", updatedSchedule);
+//
+//            return ResponseEntity.ok().body(data);
+//    }
 
     // 해당 날짜 출근인원 조회
 
@@ -77,6 +90,13 @@ public class AdminScheduleController {
         private LocalDate workingDate;
         private LocalTime startTime;
         private LocalTime endTime;
+    }
+
+    @Data
+    static class ScheduleManagementDto {
+        private Member member;
+        private Position position;
+        private ManagementStatus managementStatus;
     }
 
 
