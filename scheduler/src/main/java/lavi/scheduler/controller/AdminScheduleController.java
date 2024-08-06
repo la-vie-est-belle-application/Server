@@ -1,39 +1,52 @@
 package lavi.scheduler.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lavi.scheduler.domain.*;
+import lavi.scheduler.repository.MemberRepository;
 import lavi.scheduler.service.AdminScheduleService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
 @RequiredArgsConstructor
 public class AdminScheduleController {
+
     //AdminScheduleController 는 전부 다 관리자만 사용할 수 있는 기능임. session 이용해서 구분하는 기능 추가하기
     private final AdminScheduleService adminScheduleService;
+    private final HttpServletRequest httpServletRequest;
+    private final MemberRepository memberRepository;
 
-    // 서버 session rolltype 검증 로직 필요
-//    public void serverSesisonCheck() {
-//
-//    }
+    // 서버 session roletype 검증 로직 필요
+    public void serverSessionCheck() throws Exception {
 
+        //세션 생성
+        HttpSession session = httpServletRequest.getSession();
+//      String role = (String) session.getAttribute(String.valueOf(memberType.isRoleType()));
+        Boolean isAdmin = (Boolean) session.getAttribute("roleType");
+        if (isAdmin == null || !isAdmin) {
+            throw new Exception("관리자 권한이 필요합니다");
+        }
+
+    }
+    // 스케줄 일정 등록
     @PostMapping("/schedule/register")
-    public ResponseEntity<Map<String, List<Schedule>>> registerSchedule(@RequestBody AddScheduleDto addScheduleDto) {
-
+    public ResponseEntity<Map<String, List<Schedule>>> registerSchedule(@RequestBody RegisterScheduleDto registerScheduleDto) throws Exception {
+//        serverSessionCheck();
         log.info("[*]   입력 받은 날짜 이용해서 스케줄 등록");
-        List<Schedule> scheduleList = adminScheduleService.registerSchedule(addScheduleDto.workingDate);
 
+        List<Schedule> scheduleList = adminScheduleService.registerSchedule(registerScheduleDto.getWorkingDate());
         if (scheduleList.isEmpty()) {
             log.info("[*]   스케줄 등록 실패");
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -47,78 +60,69 @@ public class AdminScheduleController {
 
     // 날짜 상세보기 (출퇴근 시간, 명단, 포지션, 마감여부 상태 return)
     @GetMapping("/schedule/register/{workingDate}")
-        public void detailSchedule(@PathVariable ScheduleDto workingDate) {
+        public ResponseEntity<ScheduleDto> detailSchedule(@PathVariable String workingDate) throws Exception {
+//        serverSessionCheck();
+        LocalDate date = LocalDate.parse(workingDate);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
     }
 
-    // 출퇴근시간 + 포지션 + 출근여부 상태 업데이트
+    // 스케줄 업데이트
     @PostMapping("/schedule/register/update")
-    public ResponseEntity<String> updateSchedule(@RequestBody ScheduleDto scheduleDto, PositionDto positionDto) {
+    public void updateSchedule(@RequestBody ScheduleUpdateDto scheduleUpdateDto) {
 
-        log.info("[*]   출퇴근 시간 업데이트 시작");
-        Schedule updatedSchedule = adminScheduleService
-                .updateTime(scheduleDto.getWorkingDate(), scheduleDto.getStartTime(), scheduleDto.getEndTime());
-
-        if (updatedSchedule == null) {
-            log.info("[*]   해당 날짜 출퇴근 시간 업데이트 실패");
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-            log.info("[*]   해당 날짜 출퇴근 시간 업데이트 성공");
-            Map<String, Schedule> data = new HashMap<>();
-            data.put("schedule", updatedSchedule);
-
-        if (updatedSchedule.getWorkingDate() != null ){
-            log.info("[*]   포지션 정보 업데이트 시작");
-            List<User> leader = positionDto.getLeader();
-            List<User> scanner = positionDto.getScan();
-            List<User> main = positionDto.getMain();
-            List<User> dress = positionDto.getDress();
-            List<User> assistant = positionDto.getAssistant();
-            List<User> waitingRoom = positionDto.getWaitingRoom();
-            List<User> manager = positionDto.getManager();
-            List<User> navigator = positionDto.getNavigator();
-            List<User> dressRoom = positionDto.getDressRoom();
-
-            updatePosition(leader, Position.LEADER, updatedSchedule);
-            updatePosition(scanner, Position.SCAN, updatedSchedule);
-            updatePosition(main, Position.MAIN, updatedSchedule);
-            updatePosition(dress, Position.DRESS, updatedSchedule);
-            updatePosition(assistant, Position.ASSISTANT, updatedSchedule);
-            updatePosition(waitingRoom, Position.WAITINGROOM, updatedSchedule);
-            updatePosition(manager, Position.MANAGER, updatedSchedule);
-            updatePosition(navigator, Position.NAVIGATOR, updatedSchedule);
-            updatePosition(dressRoom, Position.DRESSROOM, updatedSchedule);
-        }
-            log.info("[*]   해당 날짜 포지션 업데이트 성공");
-            data.put("schedule", updatedSchedule);
-            return ResponseEntity.ok().build();
+        adminScheduleService.updateSchedule(scheduleUpdateDto);
+        //출, 퇴근 시간 들어오고 포지션이 들어 왔을 때 해당 날짜의 출, 퇴근 시간 및 해당 날짜 가지고 있는 schedule 정보에
+        //해당 멤버의 포지션 및 상태 정보 수정
 
     }
 
-    private List<ScheduleManagement> updatePosition(List<User> userList, Position position, Schedule updatedSchedule) {
-        List<ScheduleManagement> scheduleManagementList = adminScheduleService.updatePositions(userList, position, updatedSchedule);
-        return scheduleManagementList;
+    // 스케줄 마감
+    @PostMapping("/")
+    public void pixedSchedule() {
+
     }
 
     // 해당 날짜 출근인원 조회
+    @GetMapping
+    public void workingMember() {
+
+    }
 
     // 매 월 출근인원 조회 (필요하면)
 
     // 포지션 수정 기능
+    public void changePoistion() {
+
+    }
 
     // 스케줄 삭제
+    public void deleteSchedule() {
+
+    }
 
     @Data
-    static class AddScheduleDto {
+    class RegisterScheduleDto {
         private List<LocalDate> workingDate;
     }
 
     @Data
-    static class ScheduleDto{
+    class ScheduleDto {
         private LocalDate workingDate;
         private LocalTime startTime;
         private LocalTime endTime;
+        private Boolean scheduleStatus;
     }
 
+    @Data
+    public class MemberPositionDto {
+        private Long id;
+        private String name;
+    }
 
+    @Data
+    public class ScheduleUpdateDto {
+        private Schedule scheduleDto;
+        private Map<String, List<MemberPositionDto>> positionDto;
+    }
 }
