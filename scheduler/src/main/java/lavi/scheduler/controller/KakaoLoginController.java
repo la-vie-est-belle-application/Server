@@ -63,7 +63,7 @@ public class KakaoLoginController {
         } else {
 
             log.info("[*]   로그인 성공!");
-            UserSession userSession = new UserSession(member.getId(), member.getName(), member.isRollType());
+            UserSession userSession = new UserSession(member.getId(), member.getName(), member.isRoleType());
 
             //세션 생성
             HttpSession httpSession = httpServletRequest.getSession();
