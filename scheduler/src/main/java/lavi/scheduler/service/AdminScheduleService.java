@@ -8,16 +8,11 @@ import lavi.scheduler.repository.ScheduleManagementRepository;
 import lavi.scheduler.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.User;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -25,7 +20,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AdminScheduleService {
 
-    private final MemberRepository memberRepository;
     private final ScheduleRepository scheduleRepository;
     private final ScheduleManagementRepository scheduleManagementRepository;
 
@@ -44,7 +38,12 @@ public class AdminScheduleService {
 
     // 날짜 상세보기 (출퇴근 시간, 명단, 포지션, 마감여부 상태 return)
     public Schedule detailSchedule(LocalDate date) {
-        return scheduleRepository.findByWorkingDate(date);
+
+        Schedule schedule = scheduleRepository.findByWorkingDate(date);
+        if(schedule == null) {
+            throw new IllegalArgumentException("존재하지 않는 스케줄 입니다." + date);
+        }
+        return schedule;
     }
 
     // 스케줄 업데이트
@@ -87,4 +86,5 @@ public class AdminScheduleService {
 
     }
 }
+
 
