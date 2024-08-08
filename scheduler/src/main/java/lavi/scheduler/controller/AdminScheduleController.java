@@ -8,7 +8,6 @@ import lavi.scheduler.service.AdminScheduleService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
@@ -26,7 +24,6 @@ public class AdminScheduleController {
     //AdminScheduleController 는 전부 다 관리자만 사용할 수 있는 기능임. session 이용해서 구분하는 기능 추가하기
     private final AdminScheduleService adminScheduleService;
     private final HttpServletRequest httpServletRequest;
-    private final MemberRepository memberRepository;
 
     // 서버 session roletype 검증 로직 필요
     public void serverSessionCheck() throws Exception {
@@ -60,11 +57,18 @@ public class AdminScheduleController {
 
     // 날짜 상세보기 (출퇴근 시간, 명단, 포지션, 마감여부 상태 return)
     @GetMapping("/schedule/register/{workingDate}")
-        public ResponseEntity<ScheduleDto> detailSchedule(@PathVariable String workingDate) throws Exception {
+    public ResponseEntity<Schedule> detailSchedule(@PathVariable String workingDate) throws Exception {
 //        serverSessionCheck();
+        log.info("[*]   입력 받은 날짜 이용해서 스케줄 조회");
         LocalDate date = LocalDate.parse(workingDate);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
+        Schedule scheduleInfo = adminScheduleService.detailSchedule(date);
+        if(scheduleInfo == null) {
+            log.info("[*]   스케줄 조회 실패");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        log.info("[*]   스케줄 조회 성공");
+        return ResponseEntity.ok().body(scheduleInfo);
     }
 
     // 스케줄 업데이트
