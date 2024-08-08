@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -37,12 +40,15 @@ public class MemberController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body(new ResponseDto<>("회원 정보 저장 실패", false));
             }
-        }
-        log.info("[*]   회원 가입 성공");
-        return ResponseEntity.ok()
-                .body(new ResponseDto<>("회원 가입 성공", true));
-    }
+            log.info("[*]   회원 가입 성공");
 
+            Map<String, Member> data = new HashMap<>();
+            data.put("memberInfo", member);
+
+            return ResponseEntity.ok()
+                    .body(new ResponseDto<>("회원 가입 성공", true, data));
+        }
+    }
 
     @Data
     @AllArgsConstructor

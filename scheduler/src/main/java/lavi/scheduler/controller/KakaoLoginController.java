@@ -69,10 +69,12 @@ public class KakaoLoginController {
             HttpSession httpSession = httpServletRequest.getSession();
             httpSession.setAttribute("userSession", userSession);
 
+            Map<String, Member> data = new HashMap<>();
+            data.put("memberInfo", member);
+
             //회원이면 result = true
             return ResponseEntity.ok()
-                    .body(new ResponseDto<>("로그인 성공", true));
-
+                    .body(new ResponseDto<>("로그인 성공", true, data));
         }
     }
 }
