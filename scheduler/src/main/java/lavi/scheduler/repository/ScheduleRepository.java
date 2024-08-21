@@ -14,4 +14,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
     List<Schedule> findAllByWorkingDateIn(Set<LocalDate> dates);
 
+//    Schedule updateScheduleByWorkingDate(LocalDate workingDate);
+
 }

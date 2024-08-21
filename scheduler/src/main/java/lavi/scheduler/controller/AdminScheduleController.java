@@ -3,7 +3,9 @@ package lavi.scheduler.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lavi.scheduler.domain.*;
-import lavi.scheduler.repository.MemberRepository;
+import lavi.scheduler.dto.RegisterScheduleDto;
+import lavi.scheduler.dto.ScheduleDto;
+import lavi.scheduler.dto.ScheduleUpdateDto;
 import lavi.scheduler.service.AdminScheduleService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -76,20 +78,38 @@ public class AdminScheduleController {
     public void updateSchedule(@RequestBody ScheduleUpdateDto scheduleUpdateDto) {
 
         adminScheduleService.updateSchedule(scheduleUpdateDto);
+
         //출, 퇴근 시간 들어오고 포지션이 들어 왔을 때 해당 날짜의 출, 퇴근 시간 및 해당 날짜 가지고 있는 schedule 정보에
         //해당 멤버의 포지션 및 상태 정보 수정
 
     }
 
     // 스케줄 마감
-    @PostMapping("/")
-    public void pixedSchedule() {
+    @PostMapping("/schedule/register/fixed")
+    public ResponseEntity<Schedule> fixedSchedule(@RequestBody ScheduleDto scheduleDto) {
+
+        Schedule fixedSchedule = adminScheduleService.fixedSchedule(scheduleDto);
+
+        if(fixedSchedule == null) {
+            log.info("[*]   스케줄 마감 실패");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        log.info("[*]   스케줄 마감 성공");
+        return ResponseEntity.ok().body(fixedSchedule);
 
     }
 
     // 해당 날짜 출근인원 조회
-    @GetMapping
-    public void workingMember() {
+    @GetMapping("/schedule/{id}")
+    public ResponseEntity<List<ScheduleManagement>> workingMember(@PathVariable Long id) {
+
+        List<ScheduleManagement> scheduleManagementList = adminScheduleService.workingMember(id);
+        if (scheduleManagementList == null) {
+            log.info("[*]   출근인원 조회 실패");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        log.info("[*]   출근인원 조회 성공");
+        return ResponseEntity.ok().body(scheduleManagementList);
 
     }
 
@@ -105,28 +125,5 @@ public class AdminScheduleController {
 
     }
 
-    @Data
-    class RegisterScheduleDto {
-        private List<LocalDate> workingDate;
-    }
 
-    @Data
-    class ScheduleDto {
-        private LocalDate workingDate;
-        private LocalTime startTime;
-        private LocalTime endTime;
-        private Boolean scheduleStatus;
-    }
-
-    @Data
-    public class MemberPositionDto {
-        private Long id;
-        private String name;
-    }
-
-    @Data
-    public class ScheduleUpdateDto {
-        private Schedule scheduleDto;
-        private Map<String, List<MemberPositionDto>> positionDto;
-    }
 }

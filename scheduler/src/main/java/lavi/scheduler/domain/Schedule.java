@@ -33,4 +33,7 @@ public class Schedule {
         this.startTime = startTime;
         this.endTime = endTime;
     }
+    public void updateScheduleStatus(Boolean scheduleStatus) {
+        this.scheduleStatus = false;
+    }
 }
