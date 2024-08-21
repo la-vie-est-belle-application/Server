@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface ScheduleManagementRepository extends JpaRepository<ScheduleManagement, Long> {
 
-      ScheduleManagement findByScheduleIdAndMemberId(Long schedule, Long id);
+    ScheduleManagement findByScheduleIdAndMemberId(Long schedule, Long id);
 
     ScheduleManagement findByMemberIdAndSchedule_WorkingDate(Long memberId, LocalDate workingDate);
 
@@ -24,6 +24,8 @@ public interface ScheduleManagementRepository extends JpaRepository<ScheduleMana
     List<LocalDate> findByMemberIdAndMonth(@Param("memberId") Long memberId, @Param("year") int year, @Param("month") int month);
 
     List<ScheduleManagement> findAllByMemberId(Long memberId);
+
+    List<ScheduleManagement> findAllByScheduleId(@Param("scheduleId") Long scheduleId);
 
 }
 

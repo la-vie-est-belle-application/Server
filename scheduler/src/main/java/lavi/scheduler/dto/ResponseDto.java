@@ -1,4 +1,4 @@
-package lavi.scheduler.domain;
+package lavi.scheduler.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -3,7 +3,7 @@ package lavi.scheduler.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lavi.scheduler.domain.Member;
-import lavi.scheduler.domain.ResponseDto;
+import lavi.scheduler.dto.ResponseDto;
 import lavi.scheduler.service.MemberService;
 import lombok.AllArgsConstructor;
 import lombok.Data;

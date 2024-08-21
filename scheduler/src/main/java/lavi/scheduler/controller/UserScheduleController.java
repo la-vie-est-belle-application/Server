@@ -1,6 +1,7 @@
 package lavi.scheduler.controller;
 
 import lavi.scheduler.domain.Position;
+import lavi.scheduler.dto.RegisterDto;
 import lavi.scheduler.service.UserScheduleService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -28,10 +29,10 @@ public class UserScheduleController {
     public ResponseEntity<Map<String, List<LocalDate>>> registerDate(@RequestBody RegisterDto registerDto) {
 
         //출근 가능 날짜 리스트 중에 스케줄에 등록된 날짜가 맞는지 검증하기
-        List<LocalDate> unverifiedDate = userScheduleService.verifyDate(registerDto.registerDateList);
+        List<LocalDate> unverifiedDate = userScheduleService.verifyDate(registerDto.getRegisterDateList());
         if (unverifiedDate.isEmpty()) {
             //다 등록된 날짜인 경우 member, schedule, 거절 넣어서 scheduleManagement 객체 생성
-            boolean result = userScheduleService.registerSchedule(registerDto.id, registerDto.registerDateList);
+            boolean result = userScheduleService.registerSchedule(registerDto.getId(), registerDto.getRegisterDateList());
             if (result) {
                 log.info("[*]   스케줄 신청 성공");
                 return ResponseEntity.ok().build();
@@ -50,8 +51,8 @@ public class UserScheduleController {
     public Map<String, List<LocalDate>> getWorkingDayList(@RequestBody RegisterDto registerDto) {
 
         //달 정보가 아예 들어오면 베스트
-        log.info("[*]   한 달 출근 날짜 조회 = {}, {}", registerDto.workingDate, registerDto.id);
-        List<LocalDate> monthWorkingDayList = userScheduleService.getWorkingDayList(registerDto.id, registerDto.workingDate);
+        log.info("[*]   한 달 출근 날짜 조회 = {}, {}", registerDto.getWorkingDate(), registerDto.getId());
+        List<LocalDate> monthWorkingDayList = userScheduleService.getWorkingDayList(registerDto.getId(), registerDto.getWorkingDate());
 
         Map<String, List<LocalDate>> data = new HashMap<>();
         data.put("workingDateList", monthWorkingDayList);
@@ -64,11 +65,11 @@ public class UserScheduleController {
     public ResponseEntity<Map<String, List<LocalDate>>> editRegisterDate(@RequestBody RegisterDto registerDto) {
 
         log.info("[*]   출근 가능 날짜 수정");
-        List<LocalDate> unverifiedDate = userScheduleService.verifyDate(registerDto.registerDateList);
+        List<LocalDate> unverifiedDate = userScheduleService.verifyDate(registerDto.getRegisterDateList());
         if (unverifiedDate.isEmpty()) {
-            userScheduleService.editRegisterDate(registerDto.id, registerDto.registerDateList);
+            userScheduleService.editRegisterDate(registerDto.getId(), registerDto.getRegisterDateList());
             log.info("[*]   수정된 날짜 확인");
-            List<LocalDate> editWorkingDayList = userScheduleService.getWorkingDayList(registerDto.id, registerDto.registerDateList.get(0));
+            List<LocalDate> editWorkingDayList = userScheduleService.getWorkingDayList(registerDto.getId(), registerDto.getRegisterDateList().get(0));
 
             Map<String, List<LocalDate>> data = new HashMap<>();
             data.put("workingDateList", editWorkingDayList);
@@ -82,25 +83,18 @@ public class UserScheduleController {
     @PostMapping("/myPosition")
     public ResponseEntity<Map<String,Object>> getMyPosition(@RequestBody RegisterDto registerDto) {
 
-        log.info("[*]   출근 날짜 = {} 의 배정 받은 포지션 확인하기", registerDto.workingDate);
-        Position position = userScheduleService.getPositionInfo(registerDto.id, registerDto.workingDate);
+        log.info("[*]   출근 날짜 = {} 의 배정 받은 포지션 확인하기", registerDto.getWorkingDate());
+        Position position = userScheduleService.getPositionInfo(registerDto.getId(), registerDto.getWorkingDate());
 
         if (position == null) {
             //거절 혹은 대기 상태
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         Map<String, Object> data = new HashMap<>();
-        data.put("workingDate", registerDto.workingDate);
+        data.put("workingDate", registerDto.getWorkingDate());
         data.put("position", position);
 
         return ResponseEntity.ok().body(data);
-    }
-
-    @Data
-    static class RegisterDto {
-        private Long id;    //회원 번호
-        private List<LocalDate> registerDateList;   //출근 가능 날짜 리스트
-        private LocalDate workingDate;
     }
 
 }
